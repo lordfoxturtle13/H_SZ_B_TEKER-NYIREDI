@@ -4,6 +4,8 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, Teker!");
+        Console.WriteLine("\n\nEz most a TBALAZS BRANCH!!\n\n");
+
+        System.Console.WriteLine("Ma kész lesz"); //nybalazs készitette
     }
 }
