@@ -1,6 +1,6 @@
 ﻿namespace Adatkezelo;
 
-public class Okos_varos
+public class Okos_szoba
 {
     //Változók
     public int Ido { get; set; } // ora_perc_masodperc
