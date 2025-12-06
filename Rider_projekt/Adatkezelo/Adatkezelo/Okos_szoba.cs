@@ -38,22 +38,26 @@ public class Okos_szoba
     }
     
     //Értékbeállítások
-    public void HomersekletBeAllitas(bool novekszike)
+    public void HomersekletBeAllitas()
     {
         double random = MAX_HOMERSEKLET_VALTOZAS * r.NextDouble();
+        bool novekszik = r.Next(2) == 1;
         Homerseklet += novekszik ? random : -random;
         HomersekletLista.Add(Homerseklet);
+        
     }
-    public void LegnyomasBeAllitas(bool novekszike)
+    public void LegnyomasBeAllitas()
     {
         double random = MAX_LEGNYOMAS_VALTOZAS * r.NextDouble();
+        bool novekszik = r.Next(2) == 1;
         Legnyomas += novekszik ? random : -random;
         LegnyomasLista.Add(Legnyomas);
     }
     // Itt kezelünk az eseményt, hogya a páratartalom megnövekszik
-    public void ParatartalomBeAllitas(bool novekszike)
+    public void ParatartalomBeAllitas()
     {
         double random = MAX_PARATARTALOM_VALTOZAS * r.NextDouble();
+        bool novekszik = r.Next(2) == 1;
         Paratartalom += novekszik ? random : -random;
         if (Paratartalom >= MAX_PARATARTALOM) { KritikusParatartalomElerve?.Invoke(Paratartalom); }
         ParatartalomLista.Add(Paratartalom);
@@ -65,12 +69,12 @@ public class Okos_szoba
     }
     
     //Delegált
-    public delegate void Valtozas(bool novekszike);
-    public void Delegalt(bool novekszike)
+    public delegate void Valtozas();
+    public void Delegalt()
     {
         Valtozas del = new Valtozas(Homersekletallitas);
         del += LegnyomasBeAllitas;
         del += ParatartalomBeAllitas;
-        del(novekszike);
+        del();
     }
 }
