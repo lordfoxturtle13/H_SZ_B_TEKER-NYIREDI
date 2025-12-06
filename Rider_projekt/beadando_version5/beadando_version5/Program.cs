@@ -26,7 +26,8 @@ namespace beadando_version5
         static void Main(string[] args)
         {
             // Ez kell a Microsoft.Data.Sqlite csomaghoz.
-            SQLitePCL.Batteries.Init(); 
+            // SQLitePCL.Batteries.Init(); 
+            Batteries.Init(); 
 
             try
             {
@@ -53,7 +54,7 @@ namespace beadando_version5
         /// </summary>
         static void AdatokatGeneralEsMent()
         {
-            const int SIMULACIO_HOSSZA = 1440; // 24 óra * 60 perc
+            const int SZIMULACIO_HOSSZA = 1440; // 24 óra * 60 perc
 
             Console.WriteLine("--- 1. Fázis: Adatok generálása és adatbázisba mentése ---");
 
@@ -64,11 +65,11 @@ namespace beadando_version5
             Random r = new Random();
 
             // 1. A SzobaSzenzor példányosítása (a DLL-ből)
-            var szoba = new Adatkezelo.SzobaSzenzor(
-                Ido: 0,
-                Homerseklet: r.Next(20, 23), // 20-23 °C
-                Legnyomas: r.Next(1000, 1030), // 1000-1030 Bar
-                Paratartalom: r.Next(40, 55) // 40-55 %
+            var szoba = new Adatkezelo.Okosszoba(
+                ido: 0,
+                homerseklet: r.Next(20, 23), // 20-23 °C
+                legnyomas: r.Next(1000, 1030), // 1000-1030 Bar
+                paratartalom: r.Next(40, 85) // 40-85 %
             );
 
             // 2. Esemény Hozzáadása/Feliratkozás
@@ -77,21 +78,25 @@ namespace beadando_version5
             // Kezdőállapot mentése
             SqliteAdatkezelo.AdatBeszuras(
                 szoba.Homerseklet, 
-                szoba.Legnyomas, 
-                szoba.Paratartalom);
+                szoba.Paratartalom, 
+                szoba.Legnyomas);
 
             // Szimuláció futtatása 1440 lépésen (percen) keresztül
-            for (int i = 1; i <= SIMULACIO_HOSSZA; i++)
+            Console.WriteLine("\nAz első 5 elem:\n");
+            for (int i = 1; i <= SZIMULACIO_HOSSZA; i++)
             {
-                szoba.Delegalt(); 
-                szoba.Kiir(); 
+                szoba.Delegalt();
+                if (i < 6)
+                {
+                    szoba.Kiir(); 
+                }
                 // Mentés
                 SqliteAdatkezelo.AdatBeszuras(
                     szoba.Homerseklet, 
-                    szoba.Legnyomas, 
-                    szoba.Paratartalom);
+                    szoba.Paratartalom, 
+                    szoba.Legnyomas);
             }
-            Console.WriteLine($"Az adatgenerálás és mentés {SIMULACIO_HOSSZA} lépés után befejeződött.");
+            Console.WriteLine($"Az adatgenerálás és mentés {SZIMULACIO_HOSSZA} lépés után befejeződött.");
         }
         
         /// <summary>
@@ -138,6 +143,7 @@ namespace beadando_version5
             Console.WriteLine("------------------------------------------------------------------");
             foreach (var atlag in orankentiAtlagok)
             {
+                // Ellenőrizd a sorrendet!
                 Console.WriteLine($"{atlag.Ora + 1,-3} | {atlag.HomersekletAtlag,18:F2} °C | {atlag.ParatartalomAtlag,18:F2} % | {atlag.LegnyomasAtlag,14:F2} Bar");
             }
 
@@ -188,16 +194,20 @@ namespace beadando_version5
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
+        
+                    // 1. Teljesen eldobjuk a táblát (ez reseteli az ID-t is)
+                    command.CommandText = "DROP TABLE IF EXISTS MeresiAdatok;"; 
+                    command.ExecuteNonQuery();
+
+                    // 2. Újra létrehozzuk
                     command.CommandText = @"
-                    CREATE TABLE IF NOT EXISTS MeresiAdatok (
+                    CREATE TABLE MeresiAdatok (
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         Homerseklet REAL,
                         Paratartalom REAL,
                         Legnyomas REAL,
                         Idopont DATETIME DEFAULT CURRENT_TIMESTAMP
-                    );"; 
-                    command.ExecuteNonQuery();
-                    command.CommandText = "DELETE FROM MeresiAdatok;"; 
+                     );";
                     command.ExecuteNonQuery();
                 }
             }
