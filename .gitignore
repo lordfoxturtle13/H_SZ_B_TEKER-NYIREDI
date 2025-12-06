@@ -20,3 +20,7 @@ obj/
 *.db
 *.sqlite
 #meresi_adatok.json
+
+# macOS system files
+.DS_Store
+**/.DS_Store

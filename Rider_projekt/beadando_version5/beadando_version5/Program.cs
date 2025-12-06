@@ -1,6 +1,7 @@
 ﻿using Adatkezelo; // Hivatkozás a DLL-re (ahol a SzobaSzenzor van)
 using Newtonsoft.Json;
 using Microsoft.Data.Sqlite;
+using SQLitePCL;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,8 +9,7 @@ using System.Linq;
 
 namespace beadando_version5
 {
-    // JSON és Adatbázis osztály (a DLL-ből származó adatok tárolásához)
-    // Felelős: Zoli
+    // JSON és Adatbázis osztály
     public class MertAdat
     {
         public int Ido { get; set; } // A szimuláció lépésszáma (perc)
@@ -21,12 +21,10 @@ namespace beadando_version5
 
     internal class Program
     {
-        // Database connection string is a constant
         static readonly string connectionString = "Data Source=szoba_adatok.db;"; 
 
         static void Main(string[] args)
         {
-            // KÖTELEZŐ FIX: Az SQLite natív szolgáltatójának inicializálása.
             // Ez kell a Microsoft.Data.Sqlite csomaghoz.
             SQLitePCL.Batteries.Init(); 
 
@@ -52,7 +50,6 @@ namespace beadando_version5
         
         /// <summary> 
         /// Inizializálja az adatbázist, futatja a szimulációt és menti az adatokat (1. Fázis).
-        /// Felelős: Kristóf
         /// </summary>
         static void AdatokatGeneralEsMent()
         {
@@ -60,7 +57,7 @@ namespace beadando_version5
 
             Console.WriteLine("--- 1. Fázis: Adatok generálása és adatbázisba mentése ---");
 
-            // Adatbázis inicializálása (az SqliteAdatkezelo osztály már be van illesztve a kódban)
+            // Adatbázis inicializálása
             SqliteAdatkezelo.InitializeDatabase(); 
 
             // Random kezdőértékek generálása
@@ -74,7 +71,7 @@ namespace beadando_version5
                 Paratartalom: r.Next(40, 55) // 40-55 %
             );
 
-            // 2. Esemény Hozzáadása/Feliratkozás (KÖTELEZŐ KÖVETELMÉNY!)
+            // 2. Esemény Hozzáadása/Feliratkozás
             szoba.KritikusParatartalomElerve += Szoba_KritikusParatartalomElerve;
 
             // Kezdőállapot mentése
@@ -86,12 +83,8 @@ namespace beadando_version5
             // Szimuláció futtatása 1440 lépésen (percen) keresztül
             for (int i = 1; i <= SIMULACIO_HOSSZA; i++)
             {
-                // Mivel független véletlen változást választottunk, a Delegalt paraméter nélkül hívódik
                 szoba.Delegalt(); 
-
-                // Kiírás (opcionális)
-                // szoba.Kiir(); 
-
+                szoba.Kiir(); 
                 // Mentés
                 SqliteAdatkezelo.AdatBeszuras(
                     szoba.Homerseklet, 
@@ -103,7 +96,6 @@ namespace beadando_version5
         
         /// <summary>
         /// Eseménykezelő metódus, ami akkor fut le, ha a DLL-ből jövő páratartalom kritikus értéket ér el.
-        /// Felelős: Zoli
         /// </summary>
         static void Szoba_KritikusParatartalomElerve(double kritikusErtek)
         {
@@ -115,7 +107,6 @@ namespace beadando_version5
 
         /// <summary>
         /// Betölti az adatokat, elvégzi a LINQ elemzést és kiírja a JSON fájlt (2. Fázis).
-        /// Felelős: Zoli
         /// </summary>
         static void AdatokatElemezAdatbazisbol()
         {
@@ -184,19 +175,12 @@ namespace beadando_version5
         }
         
         // --- Database Helper Methods (SqliteAdatkezelo) ---
-        // A kód tisztasága érdekében ez a statikus osztály a Program osztály alá kerül beillesztésre.
-
         public static class SqliteAdatkezelo
         {
-            // Felelős: Zoli
             static readonly string connectionString = "Data Source=szoba_adatok.db;";
-
-            // Ez a fix a Main-ben van, itt nincs rá szükség, csak a logika miatt hagyom bent:
-            // public static void InitializeProvider() { SQLitePCL.Batteries.Init(); }
 
             /// <summary>
             /// Inicializálja az adatbázist (létrehozza a táblát) és törli a korábbi adatokat.
-            /// Felelős: Zoli
             /// </summary>
             public static void InitializeDatabase()
             {
@@ -217,10 +201,8 @@ namespace beadando_version5
                     command.ExecuteNonQuery();
                 }
             }
-
             /// <summary>
             /// Egyetlen mérési pont beszúrása az adatbázisba.
-            /// Felelős: Kristóf
             /// </summary>
             public static void AdatBeszuras(double homerseklet, double paratartalom, double legnyomas)
             {
@@ -238,7 +220,6 @@ namespace beadando_version5
 
             /// <summary>
             /// Összes mérési adat betöltése az adatbázisból List&lt;MertAdat&gt; formátumban.
-            /// Felelős: Zoli
             /// </summary>
             public static List<MertAdat> AdatokatBetolt()
             {
