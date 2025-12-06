@@ -1,0 +1,22 @@
+# Generated / Compiled files
+bin/
+obj/
+
+# Rider / JetBrains specific files
+.idea/
+*.iws
+
+# Visual Studio / Windows Specific files
+.vs/
+*.user
+*.suo
+
+# Package files
+*.nupkg
+*.orig
+*.lock.json
+
+# Database and Generated Data files (adjust names as needed)
+*.db
+*.sqlite
+#meresi_adatok.json
