@@ -6,6 +6,15 @@ class Program
     {
         Console.WriteLine("\n\nEz most a TBALAZS BRANCH!!\n\n");
 
-        System.Console.WriteLine("Ma kész lesz"); //nybalazs készitette
+        // ez meg előtte van
+        Console.WriteLine("kacsa-liba");
+
+      
+        
+        //még több komment
+        
+        Console.WriteLine();
+        
+        //még több
     }
 }
