@@ -1,11 +1,13 @@
-﻿using Adatkezelo; // Hivatkozás a DLL-re (ahol a SzobaSzenzor van)
+﻿//using Adatkezelo; // Hivatkozás a DLL-re, de felesleges mert az IDE érzékeli
 using Newtonsoft.Json;
 using Microsoft.Data.Sqlite;
 using SQLitePCL;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+
+// feleslegesnek bizonyultak a futáshoz, lehet hogy vissza kell állítani !!!
+//using System;
+//using System.Collections.Generic;
+//using System.IO;
+//using System.Linq;
 
 namespace beadando_version5
 {
@@ -21,7 +23,8 @@ namespace beadando_version5
 
     internal class Program
     {
-        static readonly string connectionString = "Data Source=szoba_adatok.db;"; 
+        // felesleges beállítás:
+        //static readonly string connectionString = "Data Source=szoba_adatok.db;"; 
 
         static void Main(string[] args)
         {
@@ -48,10 +51,7 @@ namespace beadando_version5
             Console.WriteLine("\nNyomj meg egy gombot a kilépéshez.");
             Console.ReadKey();
         }
-        
-        /// <summary> 
-        /// Inizializálja az adatbázist, futatja a szimulációt és menti az adatokat (1. Fázis).
-        /// </summary>
+        // Inizializálja az adatbázist, futatja a szimulációt és menti az adatokat.
         static void AdatokatGeneralEsMent()
         {
             const int SZIMULACIO_HOSSZA = 1440; // 24 óra * 60 perc
@@ -98,10 +98,7 @@ namespace beadando_version5
             }
             Console.WriteLine($"Az adatgenerálás és mentés {SZIMULACIO_HOSSZA} lépés után befejeződött.");
         }
-        
-        /// <summary>
-        /// Eseménykezelő metódus, ami akkor fut le, ha a DLL-ből jövő páratartalom kritikus értéket ér el.
-        /// </summary>
+        // Eseménykezelő metódus, ami akkor fut le, ha a DLL-ből jövő páratartalom kritikus értéket ér el.
         static void Szoba_KritikusParatartalomElerve(double kritikusErtek)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -109,10 +106,7 @@ namespace beadando_version5
             Console.WriteLine($"Jelenlegi Páratartalom: {kritikusErtek:F2} %"); 
             Console.ResetColor();
         }
-
-        /// <summary>
-        /// Betölti az adatokat, elvégzi a LINQ elemzést és kiírja a JSON fájlt (2. Fázis).
-        /// </summary>
+        // Betölti az adatokat, elvégzi a LINQ elemzést és kiírja a JSON fájlt.
         static void AdatokatElemezAdatbazisbol()
         {
             Console.WriteLine("\n--- 2. Fázis: Adatok betöltése és elemzése az adatbázisból ---");
@@ -125,9 +119,9 @@ namespace beadando_version5
                 return;
             }
 
-            // --- LINQ Lekérdezések ---
+            //LINQ Lekérdezések
 
-            // 1. LINQ: Óránkénti átlagok (GroupBy, Average)
+            // 1. LINQ: Óránkénti átlagok
             Console.WriteLine("\nElső LINQ: Óránkénti átlagok (Hőmérséklet, Páratartalom, Légnyomás)");
             var orankentiAtlagok = meresiAdatok
                 .GroupBy(adat => (adat.Ido - 1) / 60)
@@ -143,11 +137,10 @@ namespace beadando_version5
             Console.WriteLine("------------------------------------------------------------------");
             foreach (var atlag in orankentiAtlagok)
             {
-                // Ellenőrizd a sorrendet!
                 Console.WriteLine($"{atlag.Ora + 1,-3} | {atlag.HomersekletAtlag,18:F2} °C | {atlag.ParatartalomAtlag,18:F2} % | {atlag.LegnyomasAtlag,14:F2} Bar");
             }
 
-            // 2. LINQ: Páratartalom extrémumok elemzése (Where, Count)
+            // 2. LINQ: Páratartalom extrémumok elemzése
             Console.WriteLine("\nMásodik LINQ: Páratartalom extrémumok elemzése");
             const double KRITIKUS_PARATARTALOM_HATAR = 75.0; 
             var tullepettMeresek = meresiAdatok
@@ -160,7 +153,7 @@ namespace beadando_version5
             Console.WriteLine($"A kritikus ({KRITIKUS_PARATARTALOM_HATAR:F1} % feletti) páratartalom összesen {kritikusPercSzam} percen át volt mérhető.");
             Console.WriteLine($"Ez {kritikusIdotartamOra:F2} órás időtartamot jelentett.");
 
-            // 3. LINQ: Hőmérséklet és Légnyomás korreláció elemzése (OrderByDescending, ThenBy)
+            // 3. LINQ: Hőmérséklet és Légnyomás korreláció elemzése
             Console.WriteLine("\nHarmadik LINQ: Hőmérséklet és Légnyomás korreláció elemzése");
             var legmagasabbHomersekletLegalacsonyabbNyomassal = meresiAdatok
                 .OrderByDescending(adat => adat.Homerseklet)
@@ -180,14 +173,11 @@ namespace beadando_version5
             Console.WriteLine("JSON mentés sikeres a SzobaMeresek.json fájlba.");
         }
         
-        // --- Database Helper Methods (SqliteAdatkezelo) ---
+        //Database Helper Methods
         public static class SqliteAdatkezelo
         {
             static readonly string connectionString = "Data Source=szoba_adatok.db;";
-
-            /// <summary>
-            /// Inicializálja az adatbázist (létrehozza a táblát) és törli a korábbi adatokat.
-            /// </summary>
+            // Inicializálja az adatbázist (létrehozza a táblát) és törli a korábbi adatokat.
             public static void InitializeDatabase()
             {
                 using (var connection = new SqliteConnection(connectionString))
@@ -211,9 +201,7 @@ namespace beadando_version5
                     command.ExecuteNonQuery();
                 }
             }
-            /// <summary>
-            /// Egyetlen mérési pont beszúrása az adatbázisba.
-            /// </summary>
+            // Egyetlen mérési pont beszúrása az adatbázisba.
             public static void AdatBeszuras(double homerseklet, double paratartalom, double legnyomas)
             {
                 using (var connection = new SqliteConnection(connectionString))
@@ -227,10 +215,7 @@ namespace beadando_version5
                     command.ExecuteNonQuery();
                 }
             }
-
-            /// <summary>
-            /// Összes mérési adat betöltése az adatbázisból List&lt;MertAdat&gt; formátumban.
-            /// </summary>
+            // Összes mérési adat betöltése az adatbázisból
             public static List<MertAdat> AdatokatBetolt()
             {
                 var adatok = new List<MertAdat>();
