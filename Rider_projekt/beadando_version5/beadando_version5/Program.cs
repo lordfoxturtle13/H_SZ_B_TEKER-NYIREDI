@@ -12,6 +12,7 @@ using SQLitePCL;
 namespace beadando_version5
 {
     // JSON és Adatbázis osztály
+    // nyiredi
     public class MertAdat
     {
         public int Ido { get; set; } // A szimuláció lépésszáma (perc)
@@ -52,6 +53,7 @@ namespace beadando_version5
             Console.ReadKey();
         }
         // Inizializálja az adatbázist, futatja a szimulációt és menti az adatokat.
+        // teker
         static void AdatokatGeneralEsMent()
         {
             const int SZIMULACIO_HOSSZA = 1440; // 24 óra * 60 perc
@@ -99,14 +101,16 @@ namespace beadando_version5
             Console.WriteLine($"Az adatgenerálás és mentés {SZIMULACIO_HOSSZA} lépés után befejeződött.");
         }
         // Eseménykezelő metódus, ami akkor fut le, ha a DLL-ből jövő páratartalom kritikus értéket ér el.
+        // nyiredi
         static void Szoba_KritikusParatartalomElerve(double kritikusErtek)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"\n*** FIGYELEM! KRITIKUS PÁRATARTALOM ELÉRVE! ***");
+            Console.WriteLine("\n*** FIGYELEM! KRITIKUS PÁRATARTALOM ELÉRVE! ***");
             Console.WriteLine($"Jelenlegi Páratartalom: {kritikusErtek:F2} %"); 
             Console.ResetColor();
         }
         // Betölti az adatokat, elvégzi a LINQ elemzést és kiírja a JSON fájlt.
+        //közös
         static void AdatokatElemezAdatbazisbol()
         {
             Console.WriteLine("\n--- 2. Fázis: Adatok betöltése és elemzése az adatbázisból ---");
@@ -122,6 +126,7 @@ namespace beadando_version5
             //LINQ Lekérdezések
 
             // 1. LINQ: Óránkénti átlagok
+            // teker
             Console.WriteLine("\nElső LINQ: Óránkénti átlagok (Hőmérséklet, Páratartalom, Légnyomás)");
             var orankentiAtlagok = meresiAdatok
                 .GroupBy(adat => (adat.Ido - 1) / 60)
@@ -137,10 +142,11 @@ namespace beadando_version5
             Console.WriteLine("------------------------------------------------------------------");
             foreach (var atlag in orankentiAtlagok)
             {
-                Console.WriteLine($"{atlag.Ora + 1,-3} | {atlag.HomersekletAtlag,18:F2} °C | {atlag.ParatartalomAtlag,18:F2} % | {atlag.LegnyomasAtlag,14:F2} Bar");
+                Console.WriteLine($"{atlag.Ora,-3} | {atlag.HomersekletAtlag,18:F2} °C | {atlag.ParatartalomAtlag,18:F2} % | {atlag.LegnyomasAtlag,14:F2} Bar");
             }
 
             // 2. LINQ: Páratartalom extrémumok elemzése
+            // nyiredi
             Console.WriteLine("\nMásodik LINQ: Páratartalom extrémumok elemzése");
             const double KRITIKUS_PARATARTALOM_HATAR = 75.0; 
             var tullepettMeresek = meresiAdatok
@@ -154,6 +160,7 @@ namespace beadando_version5
             Console.WriteLine($"Ez {kritikusIdotartamOra:F2} órás időtartamot jelentett.");
 
             // 3. LINQ: Hőmérséklet és Légnyomás korreláció elemzése
+            // nyiredi
             Console.WriteLine("\nHarmadik LINQ: Hőmérséklet és Légnyomás korreláció elemzése");
             var legmagasabbHomersekletLegalacsonyabbNyomassal = meresiAdatok
                 .OrderByDescending(adat => adat.Homerseklet)
@@ -167,6 +174,7 @@ namespace beadando_version5
             Console.WriteLine($"Légnyomás: {legmagasabbHomersekletLegalacsonyabbNyomassal.Legnyomas:F2} Bar");
             
             // JSON Fájlba írás
+            // teker
             Console.WriteLine("\nJSON fájl létrehozása a betöltött adatokból...");
             string jsonString = JsonConvert.SerializeObject(meresiAdatok, Formatting.Indented);
             File.WriteAllText("SzobaMeresek.json", jsonString); 
@@ -174,6 +182,7 @@ namespace beadando_version5
         }
         
         //Database Helper Methods
+        //közös
         public static class SqliteAdatkezelo
         {
             static readonly string connectionString = "Data Source=szoba_adatok.db;";

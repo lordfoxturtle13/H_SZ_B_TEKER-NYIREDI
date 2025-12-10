@@ -2,6 +2,7 @@
 
 public class Okosszoba
 {
+    // nyiredi
     //Változók
     public int Ido { get; set; } // ora_perc_masodperc
     public double Homerseklet { get; set; } // celsius
@@ -12,6 +13,7 @@ public class Okosszoba
     public List<double> HomersekletLista = new List<double>();
     public List<double> LegnyomasLista = new List<double>();
     public List<double> ParatartalomLista = new List<double>();
+    // teker
     // random szám
     private Random _r = new Random();
     //konstans értékek
@@ -22,7 +24,7 @@ public class Okosszoba
     private const double MAX_PARATARTALOM = 80.0;
     public event Action<double> KritikusParatartalomElerve;
     
-    
+    // teker
     //Konstruktor
     public Okosszoba(int ido, double homerseklet, double legnyomas, double paratartalom)
     {
@@ -30,13 +32,13 @@ public class Okosszoba
         this.Homerseklet = homerseklet;
         this.Legnyomas = legnyomas;
         this.Paratartalom = paratartalom;
-        // hozzáadjuk ezeket 
+        // hozzáadjuk ezeket a listákhoz
         this.IdoLista.Add(Ido);
         this.HomersekletLista.Add(homerseklet);
         this.LegnyomasLista.Add(legnyomas);
         this.ParatartalomLista.Add(paratartalom);
     }
-    
+    // nyiredi
     //Értékbeállítások
     public void HomersekletBeAllitas()
     {
@@ -46,6 +48,7 @@ public class Okosszoba
         HomersekletLista.Add(Homerseklet);
         
     }
+    // nyiredi
     public void LegnyomasBeAllitas()
     {
         double random = MAX_LEGNYOMAS_VALTOZAS * _r.NextDouble();
@@ -54,6 +57,7 @@ public class Okosszoba
         LegnyomasLista.Add(Legnyomas);
     }
     // Itt kezelünk az eseményt, hogya a páratartalom megnövekszik
+    // teker
     public void ParatartalomBeAllitas()
     {
         double random = MAX_PARATARTALOM_VALTOZAS * _r.NextDouble();
@@ -63,11 +67,12 @@ public class Okosszoba
         ParatartalomLista.Add(Paratartalom);
     }
 
+    // teker
     public void Kiir()
     {
         Console.WriteLine($"Ido: {Ido}, Hőmérséklet: {Homerseklet}, Légnyomás: {Legnyomas}, Páratartalom: {Paratartalom}");
     }
-    
+    // nyiredi
     //Delegált
     public delegate void Valtozas();
     public void Delegalt()
